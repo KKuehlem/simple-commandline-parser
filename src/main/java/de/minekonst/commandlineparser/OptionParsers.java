@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class OptionParsers {
 
-    private static final Map<Class<?>, OptionParserFunction> functions = new HashMap<>();
+    private static final Map<Class<?>, OptionParserFunction<?>> functions = new HashMap<>();
 
     static {
         register(Integer.class, Integer::valueOf);
