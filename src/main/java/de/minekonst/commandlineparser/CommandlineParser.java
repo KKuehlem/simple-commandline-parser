@@ -1,7 +1,8 @@
 package de.minekonst.commandlineparser;
 
-import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -12,15 +13,6 @@ public class CommandlineParser {
 
     private final Map<String, Option<?>> shortNameMap = new HashMap<>();
     private final Map<String, Option<?>> longNameMap = new HashMap<>();
-    private final PrintStream out;
-
-    public CommandlineParser() {
-        this(System.out);
-    }
-
-    public CommandlineParser(PrintStream out) {
-        this.out = out;
-    }
 
     public void addOptions(Option<?>... options) {
         for (Option<?> o : options) {
@@ -35,6 +27,7 @@ public class CommandlineParser {
 
     public ParsedCommandLine parse(String... args) {
         Map<String, Object> map = new HashMap<>();
+        List<CommandlineProblem> problems = new ArrayList<>();
         Option<?> current = null;
         String lastArg = null;
 
@@ -46,39 +39,32 @@ public class CommandlineParser {
                     current = longNameMap.get(arg.substring(LONG_PREFIX.length()));
                     lastArg = arg;
                     if (current == null) {
-                        printUnknownOption(arg);
-                        return null;
+                        problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.UNKNOWN_OPTION, arg, null, null));
                     }
                 }
                 else if (arg.startsWith(SHORT_PREFIX)) {
                     current = shortNameMap.get(arg.substring(SHORT_PREFIX.length()));
                     lastArg = arg;
                     if (current == null) {
-                        printUnknownOption(arg);
-                        return null;
+                        problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.UNKNOWN_OPTION, arg, null, null));
                     }
                 }
             }
             else {
-                try {
-                    Object value = OptionParsers.parse(current.getType(), arg);
-                    map.put(current.getLongName(), value);
+                Object value = OptionParsers.parse(current.getType(), arg);
+                
+                if (value == null) {
+                    problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.INVALID_VALUE, lastArg, current.getType().getSimpleName(), arg));
                 }
-                catch (Exception ex) {
-                    printBadValue(lastArg, arg, current.getType());
+
+                if (map.put(current.getLongName(), value) != null) {
+                    problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.DUPLICATED_OPTION, lastArg, null, null));
                 }
                 current = null;
             }
         }
 
-        return new ParsedCommandLine(map);
+        return problems.isEmpty() ? new ParsedCommandLine(map) : new ParsedCommandLine(problems);
     }
 
-    private void printUnknownOption(String arg) {
-        out.printf("Error: Unknown option \"%s\", use --help / -h for a list of options\n", arg);
-    }
-
-    private void printBadValue(String lastArg, String value, Class<?> type) {
-        out.printf("Error: Cannot read value \"%s\" for option \"%s\" as %s", value, lastArg, type.getName());
-    }
 }
