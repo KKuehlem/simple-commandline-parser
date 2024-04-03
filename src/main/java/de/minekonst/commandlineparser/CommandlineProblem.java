@@ -8,13 +8,22 @@ import lombok.Getter;
 public class CommandlineProblem {
     
     public enum CommandlineProblemType {
-        INVALID_VALUE, UNKNOWN_OPTION, DUPLICATED_OPTION;
+        INVALID_VALUE, UNKNOWN_OPTION, DUPLICATED_OPTION, MISSING_REQUIRED_OPTION;
     }
 
     private final CommandlineProblemType type;
     private final String option;
     private final String optionType;
     private final String value;
+    private final Option<?> optionObject;
+
+    public CommandlineProblem(CommandlineProblemType type, String option, String optionType, String value) {
+        this.type = type;
+        this.option = option;
+        this.optionType = optionType;
+        this.value = value;
+        this.optionObject = null;
+    }
 
     @Override
     public String toString() {

@@ -31,8 +31,7 @@ public class CommandlineParserTest {
 
         Option<Integer> a = new Option<>("a", "a", Integer.class, "A simple option", true);
         Option<Double> b = new Option<>("b", "b", Double.class, "A simple option", true);
-        Option<String> c = new Option<>("c", "c", String.class, "A simple option", true);
-        parser.addOptions(a, b, c);
+        parser.addOptions(a, b);
 
         ParsedCommandLine parsed = parser.parse("--a", "42", "--b", "2.2", "-x", "ABC");
         assertFalse(parsed.isSuccess());
@@ -93,5 +92,37 @@ public class CommandlineParserTest {
 
         ParsedCommandLine parsed = parser2.parse("--a", "1", "--b", "2");
         assertThrows(IllegalStateException.class, () -> parsed.printErrors(System.out));
+    }
+
+    @Test
+    public void testRequiredOptions() {
+        CommandlineParser parser = new CommandlineParser();
+
+        Option<Integer> a = new Option<>("a", "a", Integer.class, "A simple option", true);
+        Option<Double> b = new Option<>("b", "b", Double.class, "A simple option", true);
+        Option<String> c = new Option<>("c", "c", String.class, "A simple option", false);
+        parser.addOptions(a, b, c);
+
+        ParsedCommandLine parsed = parser.parse("--a", "42", "--b", "2.2");
+        assertTrue(parsed.isSuccess());
+        assertEquals(42, (int) parsed.get(a));
+        assertEquals(2.2, parsed.get(b), 0);
+        assertNull(parsed.get(c));
+    }
+
+    @Test
+    public void testRequiredOptionMissing() {
+        CommandlineParser parser = new CommandlineParser();
+
+        Option<Integer> a = new Option<>("a", "a", Integer.class, "A simple option", true);
+        Option<Double> b = new Option<>("b", "b", Double.class, "A simple option", true);
+        Option<String> c = new Option<>("c", "c", String.class, "A simple option", false);
+        parser.addOptions(a, b, c);
+
+        ParsedCommandLine parsed = parser.parse("--a", "42");
+        assertFalse(parsed.isSuccess());
+        assertEquals(1, parsed.getProblems().size());
+        assertEquals("b", parsed.getProblems().get(0).getOption());
+        assertEquals(CommandlineProblem.CommandlineProblemType.MISSING_REQUIRED_OPTION, parsed.getProblems().get(0).getType());
     }
 }

@@ -54,13 +54,21 @@ public class CommandlineParser {
                 Object value = OptionParsers.parse(current.getType(), arg);
                 
                 if (value == null) {
-                    problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.INVALID_VALUE, lastArg, current.getType().getSimpleName(), arg));
+                    problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.INVALID_VALUE, lastArg, current.getType().getSimpleName(), arg, current));
                 }
 
                 if (map.put(current.getLongName(), value) != null) {
-                    problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.DUPLICATED_OPTION, lastArg, null, null));
+                    problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.DUPLICATED_OPTION, lastArg, null, null, current));
                 }
                 current = null;
+            }
+        }
+
+        for (Option<?> o : longNameMap.values()) {
+            if (o.isRequired() && map.get(o.getLongName()) == null) {
+                if (problems.stream().noneMatch(p -> p.getOptionObject() == o)) {
+                    problems.add(new CommandlineProblem(CommandlineProblem.CommandlineProblemType.MISSING_REQUIRED_OPTION, o.getLongName(), null, null, o));
+                }
             }
         }
 
