@@ -32,6 +32,7 @@ jobs:
           # Find the JAR file in the target directory (adjust if needed)
           JAR_FILE=$(find target -name "*.jar" | head -n 1)
           echo "JAR_FILE=${JAR_FILE}" >> $GITHUB_ENV
+          echo "JAR_NAME=$(basename $JAR_FILE)" >> $GITHUB_ENV
           # Save the version (e.g. simple-commandline-parser-1.0.0.jar -> 1.0.0)
           echo "VERSION=$(basename $JAR_FILE | sed 's/.*-\([0-9.]*\).jar/\1/')" >> $GITHUB_ENV
         shell: bash
@@ -53,4 +54,5 @@ jobs:
         with:
           upload_url: ${{ steps.release.outputs.upload_url }}
           asset_path: ${{ env.JAR_FILE }}
+          asset_name: ${{ env.JAR_NAME }}
           asset_content_type: application/java-archive
