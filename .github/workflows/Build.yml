@@ -44,7 +44,7 @@ jobs:
             draft: false
             prerelease: false
             automatic_release_tag: ${{ env.VERSION }}
-            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            repo_token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
