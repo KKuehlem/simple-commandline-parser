@@ -47,3 +47,5 @@ public class Main {
 - [ ] Help message generation
 - [ ] Add support for arrays / lists
 - [ ] Add support for enums
+- [ ] Add support for flags
+- [ ] Publish as a maven package
