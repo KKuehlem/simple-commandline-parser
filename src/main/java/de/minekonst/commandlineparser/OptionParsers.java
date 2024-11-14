@@ -36,7 +36,8 @@ public class OptionParsers {
         Objects.requireNonNull(type);
         Objects.requireNonNull(value);
         
-        OptionParserFunction f = functions.get(type);
+        @SuppressWarnings("unchecked")
+        OptionParserFunction<T> f = (OptionParserFunction<T>) functions.get(type);
         if (f == null) throw new IllegalStateException("No parser registered for class " + type.getCanonicalName());
 
         try {

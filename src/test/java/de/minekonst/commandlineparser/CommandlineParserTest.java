@@ -1,15 +1,17 @@
 package de.minekonst.commandlineparser;
 
+import java.util.List;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CommandlineParserTest {
 
     @Test
     public void test() {
         CommandlineParser parser = new CommandlineParser();
-
+        
         Option<Integer> a = new Option<>("a", "a", Integer.class, "A simple option", true);
         Option<Double> b = new Option<>("b", "b", Double.class, "A simple option", true);
         Option<String> c = new Option<>("c", "c", String.class, "A simple option", true);
@@ -125,4 +127,44 @@ public class CommandlineParserTest {
         assertEquals("b", parsed.getProblems().get(0).getOption());
         assertEquals(CommandlineProblem.CommandlineProblemType.MISSING_REQUIRED_OPTION, parsed.getProblems().get(0).getType());
     }
+
+    @Test
+    public void testCustomTypeSuccess() {
+        CommandlineParser parser = new CommandlineParser();
+        OptionParsers.register(Vector2.class, Vector2::parse);
+        assertTrue(OptionParsers.isRegistered(Vector2.class));
+
+        Option<Vector2> a = new Option<>("a", "a", Vector2.class, "Some Vector2", true);
+        parser.addOptions(a);
+
+        ParsedCommandLine parsed = parser.parse("--a", "1.0,2.0");
+        assertTrue(parsed.isSuccess());
+        assertEquals(new Vector2(1.0, 2.0), parsed.get(a));
+    }
+
+    @Test
+    public void testCustomTypeInvalidValue() {
+        CommandlineParser parser = new CommandlineParser();
+        OptionParsers.register(Vector2.class, Vector2::parse);
+        assertTrue(OptionParsers.isRegistered(Vector2.class));
+
+        Option<Vector2> a = new Option<>("a", "a", Vector2.class, "Some Vector2", true);
+        parser.addOptions(a);
+
+        ParsedCommandLine fail = parser.parse("--a", "1.0/2.0");
+        assertFalse(fail.isSuccess());
+        assertEquals(1, fail.getProblems().size());
+        assertEquals(a, fail.getProblems().get(0).getOptionObject());
+        assertEquals(CommandlineProblem.CommandlineProblemType.INVALID_VALUE, fail.getProblems().get(0).getType());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testCustomTypeNotRegistered() {
+        CommandlineParser parser = new CommandlineParser();
+        Option<List> a = new Option<>("a", "a", List.class, "Some list", true);
+        parser.addOptions(a);
+
+        ParsedCommandLine fail = parser.parse("--a", "[1,2,3]");
+    }
+
 }
