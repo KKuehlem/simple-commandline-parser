@@ -1,0 +1,55 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up JDK
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Step 3: Build with Maven
+      - name: Build with Maven
+        run: mvn clean package
+
+      # Step 4: Archive build artifact
+      - name: Save artifact
+        id: artifact
+        run: |
+          # Find the JAR file in the target directory (adjust if needed)
+          JAR_FILE=$(find target -name "*.jar" | head -n 1)
+          echo "JAR_FILE=${JAR_FILE}" >> $GITHUB_ENV
+        shell: bash
+
+      # Step 5: Create a GitHub release and upload artifact
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ${{ env.JAR_FILE }}
+          asset_name: $(basename ${{ env.JAR_FILE }})
+          asset_content_type: application/java-archive
