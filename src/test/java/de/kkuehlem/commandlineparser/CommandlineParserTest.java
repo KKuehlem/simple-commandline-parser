@@ -19,7 +19,7 @@ public class CommandlineParserTest {
 
         ParsedCommandLine parsed = parser.parse("--a", "42", "--b", "2.2", "-c", "ABC");
         assertTrue(parsed.isSuccess());
-        assertEquals(42, (int) parsed.get(a)); // Ambigious without cast
+        assertEquals(42, (int) parsed.get(a)); // Ambiguous without cast
         assertEquals(2.2, parsed.get(b), 0);
         assertEquals("ABC", parsed.get(c));
         assertEquals("ABC", parsed.get("c", String.class));
