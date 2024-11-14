@@ -1,3 +1,6 @@
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+[![Build and Release](https://github.com/KKuehlem/simple-commandline-parser/actions/workflows/Build.yml/badge.svg)](https://github.com/KKuehlem/simple-commandline-parser/actions/workflows/Build.yml)
+
 # A simple command-line parser
 This is a very simple command-line parser for Java I made for my own projects. It is designed to be easy to use and to be able to parse command-line arguments into Java objects.
 
