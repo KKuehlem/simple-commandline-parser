@@ -1,4 +1,3 @@
-![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 [![Build and Release](https://github.com/KKuehlem/simple-commandline-parser/actions/workflows/Build.yml/badge.svg)](https://github.com/KKuehlem/simple-commandline-parser/actions/workflows/Build.yml)
 
 # A simple command-line parser
