@@ -1,4 +1,4 @@
-package de.minekonst.commandlineparser;
+package de.kkuehlem.commandlineparser;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

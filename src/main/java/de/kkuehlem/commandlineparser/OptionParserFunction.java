@@ -1,4 +1,4 @@
-package de.minekonst.commandlineparser;
+package de.kkuehlem.commandlineparser;
 
 @FunctionalInterface
 public interface OptionParserFunction<T> {
